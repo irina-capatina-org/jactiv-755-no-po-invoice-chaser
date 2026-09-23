@@ -1,0 +1,169 @@
+{
+  "story_key": "JACTIV-755",
+  "branch": "architecture-jactiv-755",
+  "revision": 1,
+  "process_name": "NoPoInvoiceChaser",
+  "process_kebab": "no-po-invoice-chaser",
+  "solution_name": "no-po-invoice-chaser-755",
+  "epic_number": "755",
+  "delivery_model": "cloud",
+  "level_0_outcome": "proceed",
+  "level_0_findings": [],
+  "need_profile": "Automated weekday control that queries Coupa for invoices with no properly linked PO (status draft or new, past 7 days, credit notes excluded), counts qualifying records, and sends one Slack Block Kit message to the AP SME; sends nothing on a clean day ...",
+  "sdd_scope": "single-product",
+  "primary_product": "api-workflows",
+  "blocked_products": [
+    {
+      "product": "maestro-bpmn",
+      "reason": "platform matrix",
+      "alternative_applied": "api-workflows covers the need"
+    },
+    {
+      "product": "ixp",
+      "reason": "platform matrix",
+      "alternative_applied": "api-workflows covers the need"
+    }
+  ],
+  "projects": [
+    {
+      "name": "no-po-invoice-chaser-api",
+      "kebab": "no-po-invoice-chaser-api",
+      "product": "api-workflows",
+      "skill": "uipath-api-workflow",
+      "role": "primary",
+      "authoring_mode": "n/a",
+      "framework": "n/a",
+      "sdd_file": "docs/sdd-jactiv-755-no-po-invoice-chaser.md",
+      "build_order": 1,
+      "why": "single pinned project inside the solution"
+    }
+  ],
+  "integrated_components": [
+    {
+      "type": "integration-service",
+      "name": "coupa-uipath-test",
+      "host_project": "no-po-invoice-chaser-api",
+      "skill": "uipath-platform",
+      "why": "existing Coupa connection (5fadfc73-a372-46ae-a27c-2481741eed07)"
+    },
+    {
+      "type": "integration-service",
+      "name": "slack-product-test-app",
+      "host_project": "no-po-invoice-chaser-api",
+      "skill": "uipath-platform",
+      "why": "existing Slack connection (43d506f7-7de2-4798-aac1-9522e2e45dbb)"
+    }
+  ],
+  "queues": [],
+  "capability_addons": [
+    "integration-service"
+  ],
+  "sdd_files": [
+    {
+      "path": "docs/sdd-jactiv-755-no-po-invoice-chaser.md",
+      "template": "api-workflow-sdd-template.md",
+      "role": "single-product",
+      "project": "no-po-invoice-chaser-api"
+    }
+  ],
+  "tasks_file": "no-po-invoice-chaser-tasks.md",
+  "decisions": [
+    {
+      "level": "Constraint Gate",
+      "picked": "cloud, modern folders",
+      "reason": "org fact; blocked: maestro-bpmn, ixp",
+      "source": "default"
+    },
+    {
+      "level": "Level 1",
+      "picked": "api-workflows",
+      "reason": "pinned by FORCED_PRODUCT",
+      "source": "steer"
+    },
+    {
+      "level": "Level 2.5",
+      "picked": "one project, no dispatcher/performer split",
+      "reason": "pinned by FORCED_SCOPE",
+      "source": "steer"
+    },
+    {
+      "level": "Level 3",
+      "picked": "Integration Service connector calls",
+      "reason": "considerations §4 is the only approved shape for external calls",
+      "source": "default"
+    }
+  ],
+  "architect_review_items": [
+    {
+      "section": "PDD §15",
+      "item": "OQ-01 - Retry vs no-retry contradiction",
+      "question": "BR-08 prohibits retry, but image2.png shows Retry Coupa query and Retry Slack message (after 3 retries → Send error message) – SME must confirm which governs. `[SME REVIEW]`",
+      "default_applied": "carried forward as the PDD states it",
+      "blocking": false
+    },
+    {
+      "section": "PDD §15",
+      "item": "OQ-02 - Clean-day behaviour contradiction",
+      "question": "BR-07 and scope table say send nothing on a clean day; section 7.1 exceptions table says send a congratulatory Slack message – SME must confirm. `[SME REVIEW]`",
+      "default_applied": "carried forward as the PDD states it",
+      "blocking": false
+    },
+    {
+      "section": "PDD §15",
+      "item": "OQ-03 - Coupa access method",
+      "question": "Source states read access to Coupa but does not confirm API vs UI scraping; API is assumed. `[SME REVIEW]`",
+      "default_applied": "carried forward as the PDD states it",
+      "blocking": false
+    },
+    {
+      "section": "PDD §15",
+      "item": "OQ-04 - Coupa authentication",
+      "question": "API key vs OAuth for Coupa not specified in source. `[SME REVIEW]`",
+      "default_applied": "carried forward as the PDD states it",
+      "blocking": false
+    },
+    {
+      "section": "PDD §15",
+      "item": "OQ-05 - Coupa PO linkage field name",
+      "question": "Exact Coupa API field(s) representing a properly linked PO on invoice header/lines not named in source. `[SME REVIEW]`",
+      "default_applied": "carried forward as the PDD states it",
+      "blocking": false
+    },
+    {
+      "section": "PDD §15",
+      "item": "OQ-06 - Slack bot token scope",
+      "question": "Slack bot token with `chat:write` and DM permission to WLX9BD8FN required; provisioning not confirmed. `[SME REVIEW]`",
+      "default_applied": "carried forward as the PDD states it",
+      "blocking": false
+    },
+    {
+      "section": "PDD §15",
+      "item": "OQ-07 - Romania timezone handling",
+      "question": "EET (UTC+2) vs EEST (UTC+3) daylight saving transition must be handled by Orchestrator schedule or by automation. `[DEFAULT]` Orchestrator timezone set to Europe/Bucharest.",
+      "default_applied": "carried forward as the PDD states it",
+      "blocking": false
+    },
+    {
+      "section": "PDD §15",
+      "item": "OQ-08 - Block Kit JSON payload",
+      "question": "Source states exact Block Kit JSON is recorded in architectural considerations section 4; that section is not present in the source document – content is missing input. `[SME REVIEW]`",
+      "default_applied": "carried forward as the PDD states it",
+      "blocking": false
+    },
+    {
+      "section": "PDD §15",
+      "item": "OQ-09 - Coupa environment",
+      "question": "Source URL uses uipath-test.coupahost.com; production URL not provided. `[SME REVIEW]`",
+      "default_applied": "carried forward as the PDD states it",
+      "blocking": false
+    },
+    {
+      "section": "PDD §15",
+      "item": "Future-state diagram (image2.png) readable",
+      "question": "Shows automated flow including retry nodes contradicted by BR-08; noted in OQ-01.",
+      "default_applied": "carried forward as the PDD states it",
+      "blocking": false
+    }
+  ],
+  "revision_impact": "first design"
+}
