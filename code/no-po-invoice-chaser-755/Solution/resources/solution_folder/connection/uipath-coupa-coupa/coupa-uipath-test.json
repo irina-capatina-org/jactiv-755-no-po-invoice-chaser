@@ -1,0 +1,16 @@
+{
+  "kind": "connection",
+  "name": "coupa-uipath-test",
+  "type": "uipath-coupa-coupa",
+  "key": "5fadfc73-a372-46ae-a27c-2481741eed07",
+  "spec": {
+    "authenticationType": "AuthenticateAfterDeployment",
+    "connectorName": "uipath-coupa-coupa",
+    "connectorVersion": "1.4.44"
+  },
+  "folders": [
+    {
+      "fullyQualifiedName": "solution_folder"
+    }
+  ]
+}
