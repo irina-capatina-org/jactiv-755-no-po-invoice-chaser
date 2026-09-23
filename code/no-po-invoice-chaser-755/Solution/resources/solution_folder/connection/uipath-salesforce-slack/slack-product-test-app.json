@@ -1,0 +1,16 @@
+{
+  "kind": "connection",
+  "name": "slack-product-test-app",
+  "type": "uipath-salesforce-slack",
+  "key": "43d506f7-7de2-4798-aac1-9522e2e45dbb",
+  "spec": {
+    "authenticationType": "AuthenticateAfterDeployment",
+    "connectorName": "uipath-salesforce-slack",
+    "connectorVersion": "1.4.44"
+  },
+  "folders": [
+    {
+      "fullyQualifiedName": "solution_folder"
+    }
+  ]
+}
